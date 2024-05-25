@@ -45,41 +45,39 @@ namespace VoteKick
                 response = "Argument not an ID";
                 return false;
             }
-            if (Player.Get(pid) == null)
+            var player = Player.Get(pid);
+
+            if (player == null)
             {
                 response = "This player doesn't exist";
                 return false;
             }
-            if (Player.Get(pid).RemoteAdminAccess)
+            if (player.RemoteAdminAccess)
             {
                 response = "You can't votekick an admin";
                 return false;
             }         
+
             if(Plugin.VKLeft <= 0)
             {
                 response = "No more votekick for this round";
                 return false;
             }
+            
             if (Plugin.instance.coroutineHandle.IsRunning)
             {
                 response = "A votekick is still running";
                 return false;
             }
+            
             foreach (var ply in Player.List)
             {
                 //Log.Info($"ply: {ply.DisplayNickname}");
-                if (ply.SessionVariables.ContainsKey("votekick_voted"))
-                {
-                    ply.SessionVariables["votekick_voted"] = false;
-                }
-                else
-                {
-                    ply.SessionVariables.Add("votekick_voted", false);
-                }
-                
+                ply.SessionVariables["votekick_voted"] = false;
             }
-            Server.ExecuteCommand($"@{Player.Get(sender).DisplayNickname} has started VoteKick");
-            Plugin.instance.coroutineHandle = Timing.RunCoroutine(Plugin.VoteKick(pid));
+            // ça ne fait pas de commande not found ? @antonio
+            Server.ExecuteCommand($"@{Player.Get(sender).DisplayNickname} has started VoteKick to kick {player}");
+            Plugin.instance.coroutineHandle = Timing.RunCoroutine(Plugin.VoteKick(player));
             response = "VoteKick started";
             return true;
         }

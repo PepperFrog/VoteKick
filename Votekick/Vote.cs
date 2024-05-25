@@ -20,11 +20,17 @@ namespace VoteKick
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-            if (Plugin.voteInProgress && (bool)Player.Get(sender).SessionVariables["votekick_voted"] == false)
+            var player = Player.Get(sender);
+            if (Plugin.voteInProgress && (bool)player.SessionVariables["votekick_voted"] == false)
             {
                 Plugin.votes++;
-                Player.Get(sender).SessionVariables["votekick_voted"] = true;
-                Map.Broadcast(new Exiled.API.Features.Broadcast(Plugin.instance.Translation.VoteNeeded.Replace("%votes%",Plugin.votes.ToString()).Replace("%voteneeded%",(Player.List.Count / 2 + 1).ToString()),5));
+                player.SessionVariables["votekick_voted"] = true;
+                var message = Plugin.instance.Translation.VoteNeeded
+                    .Replace("%votes%",Plugin.votes.ToString())
+                    .Replace("%voteneeded%",(Player.List.Count / 2 + 1).ToString());
+
+
+                Map.Broadcast(new Exiled.API.Features.Broadcast(message, 5));
                 response = "You voted to kick";
                 return true;
             }

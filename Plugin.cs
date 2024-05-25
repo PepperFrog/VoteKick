@@ -48,13 +48,16 @@ namespace VoteKick
             Plugin.VKLeft = Plugin.instance.Config.VoteKickPerRound;
         }
 
-        public static IEnumerator<float> VoteKick(int playerid)
+        public static IEnumerator<float> VoteKick(Player player)
         {            
             Plugin.votes = 0;
             Plugin.voteInProgress = true;
             Plugin.VKLeft--;
-            var player = Player.Get(playerid);          
-            Map.Broadcast(new Exiled.API.Features.Broadcast(Plugin.instance.Translation.Startbroadcast.Replace("%timetovote%", Plugin.instance.Config.TimerForVote.ToString()).Replace("%playername%",player.DisplayNickname), Plugin.instance.Config.BroadcastDuration, true, Broadcast.BroadcastFlags.Normal), true);
+
+            var mesasge = Plugin.instance.Translation.Startbroadcast
+                .Replace("%timetovote%", Plugin.instance.Config.TimerForVote.ToString())
+                .Replace("%playername%", player.DisplayNickname)
+            Map.Broadcast(new Exiled.API.Features.Broadcast(mesasge, Plugin.instance.Config.BroadcastDuration, true, Broadcast.BroadcastFlags.Normal), true);
             for (int i = 0; i < Plugin.instance.Config.TimerForVote; i++)
             {
                 if (Plugin.votes >= Player.List.Count / 2 + 1)
